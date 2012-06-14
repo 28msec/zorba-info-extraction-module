@@ -12,17 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
 
-PROJECT (info_extraction_module)
+PROJECT (zorba_info_extraction_module)
+
 ENABLE_TESTING ()
 INCLUDE (CTest)
 
-FIND_PACKAGE (Zorba REQUIRED)
+FIND_PACKAGE (Zorba REQUIRED HINTS "${ZORBA_BUILD_DIR}")
 INCLUDE ("${Zorba_USE_FILE}")
-
-ADD_TEST_DIRECTORY("${PROJECT_SOURCE_DIR}/tests")
 
 ADD_SUBDIRECTORY("src")
 
-DONE_DECLARING_ZORBA_URIS()
+ADD_TEST_DIRECTORY("${PROJECT_SOURCE_DIR}/test")
+
+DONE_DECLARING_ZORBA_URIS ()

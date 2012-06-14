@@ -24,7 +24,7 @@ xquery version "3.0";
  : @project information extraction
  :)
 
-module namespace ex = 'http://www.zorba-xquery.com/modules/info-extraction-module';
+module namespace ex = "http://www.zorba-xquery.com/modules/info-extraction-module";
 
 declare namespace ann = "http://www.zorba-xquery.com/annotations";
 
