@@ -38,7 +38,7 @@ import module namespace http = "http://www.zorba-xquery.com/modules/http-client"
  :
  : @param $text XML entity or a string to be analyzed
  : @return XML document with a list of entities recognized
- : @example test/Queries/data-extraction/entities.xq
+ : @example test/Queries/entities.xq
  :)
 declare %ann:sequential function ex:entities($text as xs:string){
     let $uri := concat("http://query.yahooapis.com/v1/public/yql?q=", 
@@ -63,7 +63,7 @@ declare %ann:sequential function ex:entities($text as xs:string){
  :
  : @param $text XML document or string to be analyzed
  : @return XML document with a list of categories recognized
- : @example test/Queries/data-extraction/categories.xq
+ : @example test/Queries/categories.xq
  :)
 declare %ann:sequential function ex:categories($text){
     let $uri := concat("http://query.yahooapis.com/v1/public/yql?q=", 
@@ -82,7 +82,7 @@ declare %ann:sequential function ex:categories($text){
  :
  : @param $text XML document or string to be analyzed
  : @return XML document with a list of relations recognized
- : @example test/Queries/data-extraction/relations.xq
+ : @example test/Queries/relations.xq
  :)
 declare %ann:sequential function ex:relations($text){
     let $uri := concat("http://query.yahooapis.com/v1/public/yql?q=", 
@@ -112,7 +112,7 @@ declare %ann:sequential function ex:relations($text){
  :
  : @param $text XML document or string to be analyzed
  : @return XML document with a list of concepts recognized
- : @example test/Queries/data-extraction/concepts.xq
+ : @example test/Queries/concepts.xq
  :)
 declare %ann:sequential function ex:concepts($text){
     let $uri := concat("http://query.yahooapis.com/v1/public/yql?q=", 
@@ -142,7 +142,7 @@ declare %ann:sequential function ex:concepts($text){
  :
  : @param $text XML entity or a string to be analyzed
  : @return XML document with a list of entities recognized
- : @example test/Queries/data-extraction/entities-inline.xq
+ : @example test/Queries/entities-inline.xq
  :)
 declare %ann:sequential function ex:entities-inline($text){
    <ex:entities>{ex:entity-inline-annotation($text , ex:entities($text)//ex:entity, 0)}</ex:entities>
@@ -154,7 +154,7 @@ declare %ann:sequential function ex:entities-inline($text){
  :
  : @param $text XML document or string to be analyzed
  : @return XML document with a list of concepts recognized
- : @example test/Queries/data-extraction/concepts-inline.xq
+ : @example test/Queries/concepts-inline.xq
  :)
 declare %ann:sequential function ex:concepts-inline($text){
    <ex:concepts>{ex:concept-inline-annotation($text , ex:concepts($text)//ex:concept, 0)}</ex:concepts>

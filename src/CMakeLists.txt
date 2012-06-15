@@ -13,3 +13,5 @@
 # limitations under the License.
 
 DECLARE_ZORBA_MODULE (URI "http://www.zorba-xquery.com/modules/info-extraction-module" FILE "info-extraction-module.xq")
+
+DECLARE_ZORBA_SCHEMA (URI "http://www.zorba-xquery.com/modules/info-extraction-module" FILE "info-extraction-module.xsd")
