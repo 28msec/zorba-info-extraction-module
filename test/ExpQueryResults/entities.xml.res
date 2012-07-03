@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ex:entities xmlns:ex="http://www.zorba-xquery.com/modules/data-extraction">
+<ex:entities xmlns:ex="http://www.zorba-xquery.com/modules/info-extraction">
   <ex:entity start="0" end="14">President Obama</ex:entity>
   <ex:entity start="36" end="43" type="organization">Congress</ex:entity>
   <ex:entity start="57" end="65">tax break</ex:entity>

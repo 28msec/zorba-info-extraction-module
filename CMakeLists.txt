@@ -14,7 +14,7 @@
 
 CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
 
-PROJECT (zorba_info_extraction_module)
+PROJECT (zorba_info-extraction_module)
 
 ENABLE_TESTING ()
 INCLUDE (CTest)

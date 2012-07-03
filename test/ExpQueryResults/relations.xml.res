@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ex:relations xmlns:ex="http://www.zorba-xquery.com/modules/data-extraction">
+<ex:relations xmlns:ex="http://www.zorba-xquery.com/modules/info-extraction">
   <ex:relation>
     <ex:entity start="0" end="14">President Obama</ex:entity>
     <ex:wikipedia_url>http://en.wikipedia.com/wiki/Gabrielle_Giffords</ex:wikipedia_url>

@@ -24,7 +24,7 @@ xquery version "3.0";
  : @project information extraction
  :)
 
-module namespace ex = "http://www.zorba-xquery.com/modules/info-extraction-module";
+module namespace ex = "http://www.zorba-xquery.com/modules/info-extraction";
 
 declare namespace ann = "http://www.zorba-xquery.com/annotations";
 
@@ -91,7 +91,6 @@ declare %ann:sequential function ex:relations($text){
     let $relations := $response/query/results/yahoo:entities/yahoo:entity/yahoo:related_entities
     return if ($relations) then <ex:relations>{
         for $relation in $relations
-        order by xs:integer($relation/../yahoo:text/@start)
         return <ex:relation>{
             (let $type := 
                 for $type in $relation/..//yahoo:types/yahoo:type
@@ -125,7 +124,6 @@ declare %ann:sequential function ex:concepts($text){
         let $type := 
             for $type in $entity/yahoo:types/yahoo:type
             return substring($type, 2)
-        order by xs:integer($entity/yahoo:text/@start)
         return <ex:concept>{
             (if ($entity/yahoo:types) then <ex:entity start="{$entity/yahoo:text/@start}" end="{$entity/yahoo:text/@end}" type="{$type}"> {$entity/yahoo:text/text()} </ex:entity>
             else <ex:entity start="{$entity/yahoo:text/@start}" end="{$entity/yahoo:text/@end}"> {$entity/yahoo:text/text()} </ex:entity>) 
