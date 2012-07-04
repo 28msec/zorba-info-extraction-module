@@ -45,7 +45,7 @@ declare %ann:sequential function ex:entities($text as xs:string){
         encode-for-uri(concat("select * from contentanalysis.analyze where text=", concat('"', concat($text, '"')))))
     let $response := http:post($uri,"")[2]
     let $entities := $response/query/results/yahoo:entities/yahoo:entity
-    return if($entities) then <ex:entities>{
+    return if($entities) then
         for $entity in $entities
         let $type := 
             for $type in $entity/yahoo:types/yahoo:type
@@ -54,7 +54,7 @@ declare %ann:sequential function ex:entities($text as xs:string){
         return if($entity/yahoo:types) then
             <ex:entity start="{$entity/yahoo:text/@start}" end="{$entity/yahoo:text/@end}" type="{$type}"> {$entity/yahoo:text/text()} </ex:entity>
             else <ex:entity start="{$entity/yahoo:text/@start}" end="{$entity/yahoo:text/@end}"> {$entity/yahoo:text/text()} </ex:entity>
-    }</ex:entities> else ()
+    else ()
 };
 
 (:~
@@ -70,10 +70,10 @@ declare %ann:sequential function ex:categories($text){
         encode-for-uri(concat("select * from contentanalysis.analyze where text=", concat('"', concat($text, '"')))))
     let $response := http:post($uri,"")[2]
     let $categories := $response/query/results/yahoo:yctCategories/yahoo:yctCategory
-    return if ($categories) then <ex:categories>{
+    return if ($categories) then 
         for $category in $categories
         return <ex:category> {$category/text()} </ex:category>
-    }</ex:categories> else ()
+    else ()
 };
 
 (:~
@@ -89,7 +89,7 @@ declare %ann:sequential function ex:relations($text){
         encode-for-uri(concat("select * from contentanalysis.analyze where text=", concat('"', concat($text, '"')))))
     let $response := http:post($uri,"")[2]
     let $relations := $response/query/results/yahoo:entities/yahoo:entity/yahoo:related_entities
-    return if ($relations) then <ex:relations>{
+    return if ($relations) then
         for $relation in $relations
         return <ex:relation>{
             (let $type := 
@@ -102,7 +102,7 @@ declare %ann:sequential function ex:relations($text){
             (for $link in $relation/yahoo:wikipedia/yahoo:wiki_url
             return <ex:wikipedia_url>{$link/text()}</ex:wikipedia_url>)
         }</ex:relation>
-    }</ex:relations> else ()
+    else ()
 };
 
 (:~
@@ -118,12 +118,13 @@ declare %ann:sequential function ex:concepts($text){
         encode-for-uri(concat("select * from contentanalysis.analyze where text=", concat('"', concat($text, '"')))))
     let $response := http:post($uri,"")[2]
     let $concepts := $response/query/results/yahoo:entities/yahoo:entity/yahoo:wiki_url
-    return if ($concepts) then <ex:concepts>{
+    return if ($concepts) then
         for $link in $concepts
         let $entity := $link/..
         let $type := 
             for $type in $entity/yahoo:types/yahoo:type
             return substring($type, 2)
+        order by xs:integer($entity/yahoo:text/@start)
         return <ex:concept>{
             (if ($entity/yahoo:types) then <ex:entity start="{$entity/yahoo:text/@start}" end="{$entity/yahoo:text/@end}" type="{$type}"> {$entity/yahoo:text/text()} </ex:entity>
             else <ex:entity start="{$entity/yahoo:text/@start}" end="{$entity/yahoo:text/@end}"> {$entity/yahoo:text/text()} </ex:entity>) 
@@ -131,7 +132,7 @@ declare %ann:sequential function ex:concepts($text){
             (if ($link) then 
             <ex:wikipedia_url>{$link[1]/text()}</ex:wikipedia_url> else ())
         }</ex:concept>
-    }</ex:concepts> else ()
+    else ()
 };
 
 (:~
@@ -143,7 +144,7 @@ declare %ann:sequential function ex:concepts($text){
  : @example test/Queries/entities-inline.xq
  :)
 declare %ann:sequential function ex:entities-inline($text){
-   <ex:entities>{ex:entity-inline-annotation($text , ex:entities($text)//ex:entity, 0)}</ex:entities>
+   ex:entity-inline-annotation($text , ex:entities($text), 0)
 };
 
 (:~
@@ -155,7 +156,7 @@ declare %ann:sequential function ex:entities-inline($text){
  : @example test/Queries/concepts-inline.xq
  :)
 declare %ann:sequential function ex:concepts-inline($text){
-   <ex:concepts>{ex:concept-inline-annotation($text , ex:concepts($text)//ex:concept, 0)}</ex:concepts>
+   ex:concept-inline-annotation($text , ex:concepts($text), 0)
 };
 
 (:~
