@@ -93,9 +93,9 @@ declare %ann:sequential function ex:relations($text){
         for $relation in $relations
         return <ex:relation>{
             (let $type := 
-                for $type in $relation/..//yahoo:types/yahoo:type
+                for $type in $relation/../yahoo:types/yahoo:type
                 return substring($type, 2)
-            return if($relation/..//yahoo:types) then
+            return if($relation/../yahoo:types) then
                 <ex:entity start="{$relation/../yahoo:text/@start}" end="{$relation/../yahoo:text/@end}" type="{$type}"> {$relation/../yahoo:text/text()} </ex:entity>
                 else <ex:entity start="{$relation/../yahoo:text/@start}" end="{$relation/../yahoo:text/@end}"> {$relation/../yahoo:text/text()} </ex:entity>)
             union
