@@ -58,8 +58,8 @@ declare %ann:sequential function ex:entities($text as xs:string){
 };
 
 (:~
- : Uses Yahoo's Content Analysis webservice to return a list of categories 
- : encountered in the xml or text supplied as input.
+ : Uses Yahoo's Content Analysis webservice to return a list of categories (topics) related
+ : to the xml or text supplied as input.
  :
  : @param $text XML document or string to be analyzed
  : @return XML document with a list of categories recognized
@@ -77,8 +77,8 @@ declare %ann:sequential function ex:categories($text){
 };
 
 (:~
- : Uses Yahoo's Content Analysis webservice to return a list of relations 
- : between entities encountered in the xml or text supplied as input.
+ : Uses Yahoo's Content Analysis webservice to return a list of relations (entities found and related wikipedia links)
+ : encountered in the xml or text supplied as input.
  :
  : @param $text XML document or string to be analyzed
  : @return XML document with a list of relations recognized
@@ -106,7 +106,7 @@ declare %ann:sequential function ex:relations($text){
 };
 
 (:~
- : Uses Yahoo's Content Analysis webservice to return a list of concepts 
+ : Uses Yahoo's Content Analysis webservice to return a list of concepts (entity found and the related wikipedia link) 
  : encountered in the xml or text supplied as input.
  :
  : @param $text XML document or string to be analyzed
@@ -136,8 +136,8 @@ declare %ann:sequential function ex:concepts($text){
 };
 
 (:~
- : Uses Yahoo's Content Analysis webservice to return a list of entities (as inline annotations)
- : encountered in the xml or text supplied as input.
+ : Uses Yahoo's Content Analysis webservice to return the text supplied as input
+ : together with entities recognized as xml elements as annotations in the text.
  :
  : @param $text XML entity or a string to be analyzed
  : @return XML document with a list of entities recognized
@@ -148,8 +148,8 @@ declare %ann:sequential function ex:entities-inline($text){
 };
 
 (:~
- : Uses Yahoo's Content Analysis webservice to return a list of concepts (as inline annotations) 
- : encountered in the xml or text supplied as input.
+ : Uses Yahoo's Content Analysis webservice to return the text supplied as input
+ : together with concepts (wikipedia links) recognized as xml elements as annotations in the text.
  :
  : @param $text XML document or string to be analyzed
  : @return XML document with a list of concepts recognized
