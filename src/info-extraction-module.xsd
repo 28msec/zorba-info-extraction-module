@@ -1,40 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	elementFormDefault="qualified" 
-	xmlns:ex="http://www.zorba-xquery.com/modules/info-extraction"
-	targetNamespace="http://www.zorba-xquery.com/modules/info-extraction">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns="http://www.zorba-xquery.com/modules/info-extraction"
+     	targetNamespace="http://www.zorba-xquery.com/modules/info-extraction"
+    	elementFormDefault="qualified">
 	
-	<xs:element name="entity" type="ex:EntityType"/>
-	<xs:element name="relation" type="ex:RelationType"/>
-	<xs:element name="category" type="ex:CategoryType"/>
-	<xs:element name="concept" type="ex:ConceptType"/>
 	<xs:element name="wikipedia_url" type="xs:string"/>
 	
-	<xs:complexType name="EntityType">
-		<xs:simpleContent>
-			<xs:extension base="xs:string">
-				<xs:attribute name="start" use="required" type="xs:integer"/>
-				<xs:attribute name="end" use="required" type="xs:integer"/>
-				<xs:attribute name="type" type="xs:string"/>
-			</xs:extension>
-		</xs:simpleContent>
-	</xs:complexType>
+	<xs:element name="entity">
+		<xs:complexType mixed="true">
+			<xs:sequence>
+				<xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="start" type="xs:integer"/>
+			<xs:attribute name="end" type="xs:integer"/>
+		</xs:complexType>
+	</xs:element>
 	
-	<xs:complexType name="RelationType">
-		<xs:sequence>
-			<xs:element ref="entity"/>
-			<xs:element ref="wikipedia_url" maxOccurs="unbounded"/>
-		</xs:sequence>
-	</xs:complexType>
+	<xs:element name="relation">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="entity"/>
+				<xs:element ref="wikipedia_url" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 	
-	<xs:complexType name="ConceptType">
-		<xs:sequence>
-			<xs:element ref="entity"/>
-			<xs:element ref="wikipedia_url"/>
-		</xs:sequence>
-	</xs:complexType>
+	<xs:element name="concept">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="entity"/>
+				<xs:element ref="wikipedia_url" maxOccurs="1"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 	
-	<xs:simpleType name="CategoryType">
-		<xs:restriction base="xs:string"/>
-	</xs:simpleType>
+	<xs:element name="category" type="xs:string"/>
+	
 </xs:schema>

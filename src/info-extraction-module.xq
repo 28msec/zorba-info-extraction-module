@@ -35,37 +35,39 @@ import module namespace http = "http://www.zorba-xquery.com/modules/http-client"
 (:~
  : Uses Yahoo's Content Analysis webservice to return a list of entities 
  : encountered in the xml or text supplied as input.
+ : See http://developer.yahoo.com/search/content/V2/contentAnalysis.html for more information.
  :
  : @param $text XML entity or a string to be analyzed
  : @return XML document with a list of entities recognized
  : @example test/Queries/entities.xq
  :)
-declare %ann:sequential function ex:entities($text as xs:string){
+declare %ann:sequential function ex:entities($text as xs:string) as element(ex:entity)* {
     let $uri := concat("http://query.yahooapis.com/v1/public/yql?q=", 
         encode-for-uri(concat("select * from contentanalysis.analyze where text=", concat('"', concat($text, '"')))))
     let $response := http:post($uri,"")[2]
     let $entities := $response/query/results/yahoo:entities/yahoo:entity
     return if($entities) then
-        for $entity in $entities
-        let $type := 
-            for $type in $entity/yahoo:types/yahoo:type
-            return substring($type, 2)
+        for $entity in $entities            
         order by xs:integer($entity/yahoo:text/@start)
-        return if($entity/yahoo:types) then
-            <ex:entity start="{$entity/yahoo:text/@start}" end="{$entity/yahoo:text/@end}" type="{$type}"> {$entity/yahoo:text/text()} </ex:entity>
-            else <ex:entity start="{$entity/yahoo:text/@start}" end="{$entity/yahoo:text/@end}"> {$entity/yahoo:text/text()} </ex:entity>
+        return <ex:entity start="{$entity/yahoo:text/@start}" end="{$entity/yahoo:text/@end}">{
+		if ($entity/yahoo:types) then
+		for $type in $entity/yahoo:types/yahoo:type
+		return <ex:type> {tokenize($type/text(), '^/|^[a-zA-Z]*:/')[2]} </ex:type>
+		else ()
+	} {$entity/yahoo:text/text()} </ex:entity>
     else ()
 };
 
 (:~
  : Uses Yahoo's Content Analysis webservice to return a list of categories (topics) related
  : to the xml or text supplied as input.
+ : See http://developer.yahoo.com/search/content/V2/contentAnalysis.html for more information.
  :
  : @param $text XML document or string to be analyzed
  : @return XML document with a list of categories recognized
  : @example test/Queries/categories.xq
  :)
-declare %ann:sequential function ex:categories($text){
+declare %ann:sequential function ex:categories($text) as element(ex:category)*{
     let $uri := concat("http://query.yahooapis.com/v1/public/yql?q=", 
         encode-for-uri(concat("select * from contentanalysis.analyze where text=", concat('"', concat($text, '"')))))
     let $response := http:post($uri,"")[2]
@@ -79,12 +81,13 @@ declare %ann:sequential function ex:categories($text){
 (:~
  : Uses Yahoo's Content Analysis webservice to return a list of relations (entities found and related wikipedia links)
  : encountered in the xml or text supplied as input.
+ : See http://developer.yahoo.com/search/content/V2/contentAnalysis.html for more information.
  :
  : @param $text XML document or string to be analyzed
  : @return XML document with a list of relations recognized
  : @example test/Queries/relations.xq
  :)
-declare %ann:sequential function ex:relations($text){
+declare %ann:sequential function ex:relations($text) as element(ex:relation)*{
     let $uri := concat("http://query.yahooapis.com/v1/public/yql?q=", 
         encode-for-uri(concat("select * from contentanalysis.analyze where text=", concat('"', concat($text, '"')))))
     let $response := http:post($uri,"")[2]
@@ -92,12 +95,12 @@ declare %ann:sequential function ex:relations($text){
     return if ($relations) then
         for $relation in $relations
         return <ex:relation>{
-            (let $type := 
-                for $type in $relation/../yahoo:types/yahoo:type
-                return substring($type, 2)
-            return if($relation/../yahoo:types) then
-                <ex:entity start="{$relation/../yahoo:text/@start}" end="{$relation/../yahoo:text/@end}" type="{$type}"> {$relation/../yahoo:text/text()} </ex:entity>
-                else <ex:entity start="{$relation/../yahoo:text/@start}" end="{$relation/../yahoo:text/@end}"> {$relation/../yahoo:text/text()} </ex:entity>)
+            <ex:entity start="{$relation/../yahoo:text/@start}" end="{$relation/../yahoo:text/@end}"> {
+            	if($relation/../yahoo:types) then
+            	for $type in $relation/../yahoo:types/yahoo:type
+		return <ex:type> {tokenize($type/text(), '^/|^[a-zA-Z]*:/')[2]} </ex:type>
+		else ()
+            } {$relation/../yahoo:text/text()} </ex:entity>
             union
             (for $link in $relation/yahoo:wikipedia/yahoo:wiki_url
             return <ex:wikipedia_url>{$link/text()}</ex:wikipedia_url>)
@@ -108,29 +111,29 @@ declare %ann:sequential function ex:relations($text){
 (:~
  : Uses Yahoo's Content Analysis webservice to return a list of concepts (entity found and the related wikipedia link) 
  : encountered in the xml or text supplied as input.
+ : See http://developer.yahoo.com/search/content/V2/contentAnalysis.html for more information.
  :
  : @param $text XML document or string to be analyzed
  : @return XML document with a list of concepts recognized
  : @example test/Queries/concepts.xq
  :)
-declare %ann:sequential function ex:concepts($text){
+declare %ann:sequential function ex:concepts($text) as element(ex:concept)*{
     let $uri := concat("http://query.yahooapis.com/v1/public/yql?q=", 
         encode-for-uri(concat("select * from contentanalysis.analyze where text=", concat('"', concat($text, '"')))))
     let $response := http:post($uri,"")[2]
     let $concepts := $response/query/results/yahoo:entities/yahoo:entity/yahoo:wiki_url
     return if ($concepts) then
         for $link in $concepts
-        let $entity := $link/..
-        let $type := 
-            for $type in $entity/yahoo:types/yahoo:type
-            return substring($type, 2)
-        order by xs:integer($entity/yahoo:text/@start)
+        order by xs:integer($link/../yahoo:text/@start)
         return <ex:concept>{
-            (if ($entity/yahoo:types) then <ex:entity start="{$entity/yahoo:text/@start}" end="{$entity/yahoo:text/@end}" type="{$type}"> {$entity/yahoo:text/text()} </ex:entity>
-            else <ex:entity start="{$entity/yahoo:text/@start}" end="{$entity/yahoo:text/@end}"> {$entity/yahoo:text/text()} </ex:entity>) 
+            <ex:entity start="{$link/../yahoo:text/@start}" end="{$link/../yahoo:text/@end}">{
+            	if($link/../yahoo:types) then
+            	for $type in $link/../yahoo:types/yahoo:type
+            	return <ex:type> {tokenize($type/text(), '^/|^[a-zA-Z]*:/')[2]} </ex:type>
+		else ()
+            } {$link/../yahoo:text/text()} </ex:entity>
             union 
-            (if ($link) then 
-            <ex:wikipedia_url>{$link[1]/text()}</ex:wikipedia_url> else ())
+            (<ex:wikipedia_url>{$link[1]/text()}</ex:wikipedia_url>)
         }</ex:concept>
     else ()
 };
@@ -169,9 +172,11 @@ declare %ann:sequential function ex:concepts-inline($text){
  :)
 declare %private function ex:entity-inline-annotation($text, $entities, $size){
     if(count($entities)=0) then $text 
-    else(substring($text, 0, ($entities/@start)[1] +1 -$size), 
-        $entities[1],
-        ex:entity-inline-annotation(substring($text, ($entities/@end)[1] +2 -$size), $entities[position() >1], ($entities/@end)[1] +1))
+    else(substring($text, 0, ($entities[1]/@start) +1 -$size), 
+        if($entities[1]/ex:type) then
+        <ex:entity start="{$entities[1]/@start}" end="{$entities[1]/@end}" type="{$entities[1]/ex:type[1]}"> {$entities[1]/text()} </ex:entity>
+        else $entities[1],
+        ex:entity-inline-annotation(substring($text, ($entities[1]/@end)+2 -$size), $entities[position() >1], ($entities[1]/@end)+1))
 };
 
 (:~
