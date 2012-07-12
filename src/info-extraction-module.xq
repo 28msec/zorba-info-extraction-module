@@ -109,7 +109,7 @@ declare %ann:sequential function ex:relations($text) as element(ex:relation)*{
 };
 
 (:~
- : Uses Yahoo's Content Analysis webservice to return a list of concepts (entity found and the related wikipedia link) 
+ : Uses Yahoo's Content Analysis webservice to return a list of concepts (entity found and the corresponding wikipedia link) 
  : encountered in the xml or text supplied as input.
  : See http://developer.yahoo.com/search/content/V2/contentAnalysis.html for more information.
  :
@@ -152,7 +152,7 @@ declare %ann:sequential function ex:entities-inline($text){
 
 (:~
  : Uses Yahoo's Content Analysis webservice to return the text supplied as input
- : together with concepts (wikipedia links) recognized as xml elements as annotations in the text.
+ : together with concepts (entities with corresponding wikipedia link) recognized as xml elements as annotations in the text.
  :
  : @param $text XML document or string to be analyzed
  : @return XML document with a list of concepts recognized
