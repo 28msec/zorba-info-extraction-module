@@ -32,6 +32,8 @@ declare namespace yahoo = "urn:yahoo:cap";
 
 import module namespace http = "http://www.zorba-xquery.com/modules/http-client";
 
+import schema namespace h = "http://expath.org/ns/http-client";
+
 (:~
  : Uses Yahoo's Content Analysis webservice to return a list of entities 
  : encountered in the xml or text supplied as input.
@@ -41,10 +43,8 @@ import module namespace http = "http://www.zorba-xquery.com/modules/http-client"
  : @return XML document with a list of entities recognized
  : @example test/Queries/entities.xq
  :)
-declare %ann:sequential function ex:entities($text as xs:string) as element(ex:entity)* {
-    let $uri := concat("http://query.yahooapis.com/v1/public/yql?q=", 
-        encode-for-uri(concat("select * from contentanalysis.analyze where text=", concat('"', concat($text, '"')))))
-    let $response := http:post($uri,"")[2]
+declare %ann:sequential function ex:entities($text as xs:string) as element(ex:entity)*{
+    let $response := ex:server-connection($text)
     let $entities := $response/query/results/yahoo:entities/yahoo:entity
     return if($entities) then
         for $entity in $entities            
@@ -68,9 +68,7 @@ declare %ann:sequential function ex:entities($text as xs:string) as element(ex:e
  : @example test/Queries/categories.xq
  :)
 declare %ann:sequential function ex:categories($text) as element(ex:category)*{
-    let $uri := concat("http://query.yahooapis.com/v1/public/yql?q=", 
-        encode-for-uri(concat("select * from contentanalysis.analyze where text=", concat('"', concat($text, '"')))))
-    let $response := http:post($uri,"")[2]
+    let $response := ex:server-connection($text)
     let $categories := $response/query/results/yahoo:yctCategories/yahoo:yctCategory
     return if ($categories) then 
         for $category in $categories
@@ -88,9 +86,7 @@ declare %ann:sequential function ex:categories($text) as element(ex:category)*{
  : @example test/Queries/relations.xq
  :)
 declare %ann:sequential function ex:relations($text) as element(ex:relation)*{
-    let $uri := concat("http://query.yahooapis.com/v1/public/yql?q=", 
-        encode-for-uri(concat("select * from contentanalysis.analyze where text=", concat('"', concat($text, '"')))))
-    let $response := http:post($uri,"")[2]
+    let $response := ex:server-connection($text)
     let $relations := $response/query/results/yahoo:entities/yahoo:entity/yahoo:related_entities
     return if ($relations) then
         for $relation in $relations
@@ -118,9 +114,7 @@ declare %ann:sequential function ex:relations($text) as element(ex:relation)*{
  : @example test/Queries/concepts.xq
  :)
 declare %ann:sequential function ex:concepts($text) as element(ex:concept)*{
-    let $uri := concat("http://query.yahooapis.com/v1/public/yql?q=", 
-        encode-for-uri(concat("select * from contentanalysis.analyze where text=", concat('"', concat($text, '"')))))
-    let $response := http:post($uri,"")[2]
+    let $response := ex:server-connection($text)
     let $concepts := $response/query/results/yahoo:entities/yahoo:entity/yahoo:wiki_url
     return if ($concepts) then
         for $link in $concepts
@@ -194,4 +188,26 @@ declare %private function ex:concept-inline-annotation($text, $concepts, $size){
         <entity start="{$concepts[1]/ex:entity/@start}" end="{$concepts[1]/ex:entity/@end}" url="{$concepts[1]/ex:wikipedia_url/text()}">{$concepts[1]/ex:entity/text()}</entity>
         else $concepts[1]/ex:entity,
         ex:concept-inline-annotation(substring($text, ($concepts[1]/ex:entity/@end) +2 -$size), $concepts[position() >1], ($concepts[1]/ex:entity/@end) +1))
+};
+
+(:~
+ : Establishes connection with the Yahoo Server
+ :
+ : @param $text XML document or string to be analyzed
+ : @return XML document returned by the Yahoo Server
+ :)
+declare %private %ann:sequential function ex:server-connection($text as xs:string){
+   let $uri := iri-to-uri(concat("q=select * from contentanalysis.analyze where text=", 
+      concat("&quot;", concat(replace(normalize-space($text), "&quot;", "&apos;"), "&quot;"))))
+   let $req := 
+      <h:request method="POST" href="http://query.yahooapis.com/v1/public/yql">
+         <h:header name="Connection" value="keep-alive"/>
+         <h:body media-type="application/x-www-form-urlencoded">
+         {$uri}
+         </h:body>
+      </h:request>
+    let $response := http:send-request($req, (), ())
+    return if ($response[1]/@status = 200)
+    	then $response[2]
+    	else ()
 };
