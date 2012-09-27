@@ -185,7 +185,7 @@ declare %private function ex:concept-inline-annotation($text, $concepts, $size){
     if(count($concepts)=0) then $text 
     else(substring($text, 0, ($concepts[1]/ex:entity/@start) +1 -$size),
         if ($concepts[1]/ex:wikipedia_url) then
-        <entity start="{$concepts[1]/ex:entity/@start}" end="{$concepts[1]/ex:entity/@end}" url="{$concepts[1]/ex:wikipedia_url/text()}">{$concepts[1]/ex:entity/text()}</entity>
+        <ex:concept start="{$concepts[1]/ex:entity/@start}" end="{$concepts[1]/ex:entity/@end}" url="{$concepts[1]/ex:wikipedia_url/text()}">{$concepts[1]/ex:entity/text()}</ex:concept>
         else $concepts[1]/ex:entity,
         ex:concept-inline-annotation(substring($text, ($concepts[1]/ex:entity/@end) +2 -$size), $concepts[position() >1], ($concepts[1]/ex:entity/@end) +1))
 };
