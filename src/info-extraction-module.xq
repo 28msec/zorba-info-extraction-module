@@ -46,15 +46,16 @@ import schema namespace h = "http://expath.org/ns/http-client";
 declare %ann:sequential function ex:entities($text as xs:string) as element(ex:entity)*{
     let $response := ex:server-connection($text)
     let $entities := $response/query/results/yahoo:entities/yahoo:entity
-    return if($entities) then
+    return if ( $entities ) then
         for $entity in $entities            
         order by xs:integer($entity/yahoo:text/@start)
         return <ex:entity start="{$entity/yahoo:text/@start}" end="{$entity/yahoo:text/@end}">{
-		if ($entity/yahoo:types) then
-		for $type in $entity/yahoo:types/yahoo:type
-		return <ex:type> {tokenize($type/text(), '^/|^[a-zA-Z]*:/')[2]} </ex:type>
-		else ()
-	} {$entity/yahoo:text/text()} </ex:entity>
+		    if ( $entity/yahoo:types ) then
+		    for $type in $entity/yahoo:types/yahoo:type
+		    return <ex:type>{ replace($type/text(), '^/|^[a-zA-Z]*:/','') }</ex:type>
+		    else ()
+	}
+	{ $entity/yahoo:text/text() }</ex:entity>
     else ()
 };
 
@@ -70,9 +71,9 @@ declare %ann:sequential function ex:entities($text as xs:string) as element(ex:e
 declare %ann:sequential function ex:categories($text) as element(ex:category)*{
     let $response := ex:server-connection($text)
     let $categories := $response/query/results/yahoo:yctCategories/yahoo:yctCategory
-    return if ($categories) then 
+    return if ( $categories ) then 
         for $category in $categories
-        return <ex:category> {$category/text()} </ex:category>
+        return <ex:category>{ $category/text() }</ex:category>
     else ()
 };
 
@@ -88,15 +89,16 @@ declare %ann:sequential function ex:categories($text) as element(ex:category)*{
 declare %ann:sequential function ex:relations($text) as element(ex:relation)*{
     let $response := ex:server-connection($text)
     let $relations := $response/query/results/yahoo:entities/yahoo:entity/yahoo:related_entities
-    return if ($relations) then
+    return if ( $relations ) then
         for $relation in $relations
-        return <ex:relation>{
-            <ex:entity start="{$relation/../yahoo:text/@start}" end="{$relation/../yahoo:text/@end}"> {
-            	if($relation/../yahoo:types) then
-            	for $type in $relation/../yahoo:types/yahoo:type
-		return <ex:type> {tokenize($type/text(), '^/|^[a-zA-Z]*:/')[2]} </ex:type>
-		else ()
-            } {$relation/../yahoo:text/text()} </ex:entity>
+        return <ex:relation>{        
+            <ex:entity start="{$relation/../yahoo:text/@start}" end="{$relation/../yahoo:text/@end}">{
+            	if ( $relation/../yahoo:types ) then
+                	for $type in $relation/../yahoo:types/yahoo:type
+		            return <ex:type>{ replace($type/text(), '^/|^[a-zA-Z]*:/','') }</ex:type>
+		        else ()
+            }
+            { $relation/../yahoo:text/text() }</ex:entity>
             union
             (for $link in $relation/yahoo:wikipedia/yahoo:wiki_url
             return <ex:wikipedia_url>{$link/text()}</ex:wikipedia_url>)
@@ -116,16 +118,17 @@ declare %ann:sequential function ex:relations($text) as element(ex:relation)*{
 declare %ann:sequential function ex:concepts($text) as element(ex:concept)*{
     let $response := ex:server-connection($text)
     let $concepts := $response/query/results/yahoo:entities/yahoo:entity/yahoo:wiki_url
-    return if ($concepts) then
+    return if ( $concepts ) then
         for $link in $concepts
         order by xs:integer($link/../yahoo:text/@start)
         return <ex:concept>{
             <ex:entity start="{$link/../yahoo:text/@start}" end="{$link/../yahoo:text/@end}">{
-            	if($link/../yahoo:types) then
+            	if ( $link/../yahoo:types ) then
             	for $type in $link/../yahoo:types/yahoo:type
-            	return <ex:type> {tokenize($type/text(), '^/|^[a-zA-Z]*:/')[2]} </ex:type>
+            	return <ex:type>{ replace($type/text(), '^/|^[a-zA-Z]*:/','') }</ex:type>
 		else ()
-            } {$link/../yahoo:text/text()} </ex:entity>
+            } 
+            { $link/../yahoo:text/text() }</ex:entity>
             union 
             (<ex:wikipedia_url>{$link[1]/text()}</ex:wikipedia_url>)
         }</ex:concept>
@@ -165,9 +168,9 @@ declare %ann:sequential function ex:concepts-inline($text){
  : @return XML document with a list of entities recognized
  :)
 declare %private function ex:entity-inline-annotation($text, $entities, $size){
-    if(count($entities)=0) then $text 
+    if ( count($entities) = 0 ) then $text 
     else(substring($text, 0, ($entities[1]/@start) +1 -$size), 
-        if($entities[1]/ex:type) then
+        if ( count( $entities[1]/ex:type) >= 1 ) then
         <ex:entity start="{$entities[1]/@start}" end="{$entities[1]/@end}" type="{$entities[1]/ex:type[1]}"> {$entities[1]/text()} </ex:entity>
         else $entities[1],
         ex:entity-inline-annotation(substring($text, ($entities[1]/@end)+2 -$size), $entities[position() >1], ($entities[1]/@end)+1))
@@ -182,10 +185,10 @@ declare %private function ex:entity-inline-annotation($text, $entities, $size){
  : @return XML document with a list of concepts recognized
  :)
 declare %private function ex:concept-inline-annotation($text, $concepts, $size){
-    if(count($concepts)=0) then $text 
+    if ( count($concepts) = 0 ) then $text 
     else(substring($text, 0, ($concepts[1]/ex:entity/@start) +1 -$size),
-        if ($concepts[1]/ex:wikipedia_url) then
-        <ex:concept start="{$concepts[1]/ex:entity/@start}" end="{$concepts[1]/ex:entity/@end}" url="{$concepts[1]/ex:wikipedia_url/text()}">{$concepts[1]/ex:entity/text()}</ex:concept>
+        if ( count( $concepts[1]/ex:wikipedia_url ) >= 1 ) 
+        then <ex:concept xmlns:ex="http://www.zorba-xquery.com/modules/info-extraction" start="{$concepts[1]/ex:entity/@start}" end="{$concepts[1]/ex:entity/@end}" url="{$concepts[1]/ex:wikipedia_url[1]/text()}">{$concepts[1]/ex:entity/text()}</ex:concept>
         else $concepts[1]/ex:entity,
         ex:concept-inline-annotation(substring($text, ($concepts[1]/ex:entity/@end) +2 -$size), $concepts[position() >1], ($concepts[1]/ex:entity/@end) +1))
 };

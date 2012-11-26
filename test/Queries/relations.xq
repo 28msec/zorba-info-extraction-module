@@ -4,9 +4,7 @@ import schema namespace schema = 'http://www.zorba-xquery.com/modules/info-extra
 
 let $result := ex:relations("President Obama called Wednesday on Congress to extend a tax break for students included in last year's economic stimulus package, arguing that the policy provides more generous assistance.")
 
-let $validated := for $r in $result return validate { $r }
-
-return count ( $validated ) > 0
+return count ( for $r in $result return validate { $r } ) > 0
     
 (:
 

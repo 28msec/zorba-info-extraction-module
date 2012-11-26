@@ -1,9 +1,10 @@
 import module namespace ex = 'http://www.zorba-xquery.com/modules/info-extraction';
 
+import schema namespace schema = 'http://www.zorba-xquery.com/modules/info-extraction';
+
 let $result := ex:concepts-inline("President Obama called Wednesday on Congress to extend a tax break for students included in last year's economic stimulus package, arguing that the policy provides more generous assistance.")
 
-return count($result) > 0
-
+return count ( for $c in <aux>{$result}</aux>/ex:concept return validate { $c } ) > 0
 
 (:
 

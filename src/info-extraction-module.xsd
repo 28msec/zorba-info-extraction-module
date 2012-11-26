@@ -5,35 +5,38 @@
     	elementFormDefault="qualified">
 	
 	<xs:element name="wikipedia_url" type="xs:string"/>
+	<xs:element name="category" type="xs:string"/>
 	
 	<xs:element name="entity">
 		<xs:complexType mixed="true">
 			<xs:sequence>
 				<xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 			</xs:sequence>
-			<xs:attribute name="start" type="xs:integer"/>
+			<xs:attribute name="start" type="xs:integer" use="required"/>
+			<xs:attribute name="end" type="xs:integer" use="required"/>
+			<xs:attribute name="type" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+		
+	<xs:element name="concept">
+		<xs:complexType mixed="true">
+			<xs:sequence>
+				<xs:element ref="entity" minOccurs="0" maxOccurs="1"/>
+				<xs:element ref="wikipedia_url" minOccurs="0" maxOccurs="1"/>
+			</xs:sequence>
+		    <xs:attribute name="start" type="xs:integer"/>
 			<xs:attribute name="end" type="xs:integer"/>
+			<xs:attribute name="url" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
 	
 	<xs:element name="relation">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="entity"/>
-				<xs:element ref="wikipedia_url" maxOccurs="unbounded"/>
+				<xs:element ref="entity" minOccurs="1" maxOccurs="1"/>
+				<xs:element ref="wikipedia_url" minOccurs="1" maxOccurs="unbounded"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	
-	<xs:element name="concept">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="entity"/>
-				<xs:element ref="wikipedia_url" maxOccurs="1"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	
-	<xs:element name="category" type="xs:string"/>
 	
 </xs:schema>
