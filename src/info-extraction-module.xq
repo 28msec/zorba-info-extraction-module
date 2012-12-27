@@ -36,11 +36,11 @@ import schema namespace h = "http://expath.org/ns/http-client";
 
 (:~
  : Uses Yahoo's Content Analysis webservice to return a list of entities 
- : encountered in the xml or text supplied as input.
+ : encountered in the text supplied as input.
  : See http://developer.yahoo.com/search/content/V2/contentAnalysis.html for more information.
  :
- : @param $text XML entity or a string to be analyzed
- : @return XML document with a list of entities recognized
+ : @param $text String to be analyzed
+ : @return Sequence of recognized entities
  : @example test/Queries/entities.xq
  :)
 declare %ann:sequential function ex:entities($text as xs:string) as element(ex:entity)*{
@@ -61,11 +61,11 @@ declare %ann:sequential function ex:entities($text as xs:string) as element(ex:e
 
 (:~
  : Uses Yahoo's Content Analysis webservice to return a list of categories (topics) related
- : to the xml or text supplied as input.
+ : to the text supplied as input.
  : See http://developer.yahoo.com/search/content/V2/contentAnalysis.html for more information.
  :
- : @param $text XML document or string to be analyzed
- : @return XML document with a list of categories recognized
+ : @param $text String to be analyzed
+ : @return Sequence of recognized categories
  : @example test/Queries/categories.xq
  :)
 declare %ann:sequential function ex:categories($text) as element(ex:category)*{
@@ -79,11 +79,11 @@ declare %ann:sequential function ex:categories($text) as element(ex:category)*{
 
 (:~
  : Uses Yahoo's Content Analysis webservice to return a list of relations (entities found and related wikipedia links)
- : encountered in the xml or text supplied as input.
+ : encountered in the text supplied as input.
  : See http://developer.yahoo.com/search/content/V2/contentAnalysis.html for more information.
  :
- : @param $text XML document or string to be analyzed
- : @return XML document with a list of relations recognized
+ : @param $text String to be analyzed
+ : @return Sequence of recognized relations
  : @example test/Queries/relations.xq
  :)
 declare %ann:sequential function ex:relations($text) as element(ex:relation)*{
@@ -108,11 +108,11 @@ declare %ann:sequential function ex:relations($text) as element(ex:relation)*{
 
 (:~
  : Uses Yahoo's Content Analysis webservice to return a list of concepts (entity found and the corresponding wikipedia link) 
- : encountered in the xml or text supplied as input.
+ : encountered in the text supplied as input.
  : See http://developer.yahoo.com/search/content/V2/contentAnalysis.html for more information.
  :
- : @param $text XML document or string to be analyzed
- : @return XML document with a list of concepts recognized
+ : @param $text String to be analyzed
+ : @return Sequence of recognized concepts
  : @example test/Queries/concepts.xq
  :)
 declare %ann:sequential function ex:concepts($text) as element(ex:concept)*{
@@ -137,37 +137,38 @@ declare %ann:sequential function ex:concepts($text) as element(ex:concept)*{
 
 (:~
  : Uses Yahoo's Content Analysis webservice to return the text supplied as input
- : together with entities recognized as xml elements as annotations in the text.
+ : together with entities recognized annotated as xml elements in the text.
  :
- : @param $text XML entity or a string to be analyzed
- : @return XML document with a list of entities recognized
+ : @param $text String to be analyzed
+ : @return Mixed sequence of strings and &lt;ex:entity&gt; elements
  : @example test/Queries/entities-inline.xq
  :)
-declare %ann:sequential function ex:entities-inline($text){
+declare %ann:sequential function ex:entities-inline($text) as item()*{
    ex:entity-inline-annotation($text , ex:entities($text), 0)
 };
 
 (:~
  : Uses Yahoo's Content Analysis webservice to return the text supplied as input
- : together with concepts (entities with corresponding wikipedia link) recognized as xml elements as annotations in the text.
+ : together with concepts (entities with corresponding wikipedia link) annotated
+ : as xml elements in the text.
  :
- : @param $text XML document or string to be analyzed
- : @return XML document with a list of concepts recognized
+ : @param $text String to be analyzed
+ : @return Mixed sequence of strings and &lt;ex:concept&gt; elements
  : @example test/Queries/concepts-inline.xq
  :)
-declare %ann:sequential function ex:concepts-inline($text){
+declare %ann:sequential function ex:concepts-inline($text) as item()*{
    ex:concept-inline-annotation($text , ex:concepts($text), 0)
 };
 
 (:~
  : Creates entities inline annotations in a given string
  :
- : @param $text XML document or string to be analyzed
+ : @param $text String to be analyzed
  : @param $entities list of entities found in the given string
  : @param $size size of the remaining string
- : @return XML document with a list of entities recognized
+ : @return Mixed sequence of strings and &lt;ex:entity&gt; elements
  :)
-declare %private function ex:entity-inline-annotation($text, $entities, $size){
+declare %private function ex:entity-inline-annotation($text, $entities, $size) as item()*{
     if ( count($entities) = 0 ) then $text 
     else(substring($text, 0, ($entities[1]/@start) +1 -$size), 
         if ( count( $entities[1]/ex:type) >= 1 ) then
@@ -179,12 +180,12 @@ declare %private function ex:entity-inline-annotation($text, $entities, $size){
 (:~
  : Creates concepts inline annotations in a given string
  :
- : @param $text XML document or string to be analyzed
+ : @param $text String to be analyzed
  : @param $concepts list of concepts found in the given string
  : @param $size size of the remaining string
- : @return XML document with a list of concepts recognized
+ : @return Mixed sequence of strings and &lt;ex:concept&gt; elements
  :)
-declare %private function ex:concept-inline-annotation($text, $concepts, $size){
+declare %private function ex:concept-inline-annotation($text, $concepts, $size) as item()*{
     if ( count($concepts) = 0 ) then $text 
     else(substring($text, 0, ($concepts[1]/ex:entity/@start) +1 -$size),
         if ( count( $concepts[1]/ex:wikipedia_url ) >= 1 ) 
@@ -196,7 +197,7 @@ declare %private function ex:concept-inline-annotation($text, $concepts, $size){
 (:~
  : Establishes connection with the Yahoo Server
  :
- : @param $text XML document or string to be analyzed
+ : @param $text String to be analyzed
  : @return XML document returned by the Yahoo Server
  :)
 declare %private %ann:sequential function ex:server-connection($text as xs:string){
