@@ -17,16 +17,16 @@ xquery version "3.0";
  :)
  
 (:~
- : This library module provides data extraction functions that return a list  
- : of entities, relations, categories and concepts present in a given text.
+ : <p>This library module provides data extraction functions that return a list  
+ : of entities, relations, categories and concepts present in a given text.</p>
  :
  : @author Pedro Antunes
- : @project information extraction
+ : @project Zorba/Data Cleaning/Info Extraction
  :)
 
-module namespace ex = "http://www.zorba-xquery.com/modules/info-extraction";
+module namespace ex = "http://zorba.io/modules/info-extraction";
 
-declare namespace ann = "http://www.zorba-xquery.com/annotations";
+declare namespace ann = "http://zorba.io/annotations";
 
 declare namespace yahoo = "urn:yahoo:cap";
 
@@ -35,9 +35,9 @@ import module namespace http = "http://www.zorba-xquery.com/modules/http-client"
 import schema namespace h = "http://expath.org/ns/http-client";
 
 (:~
- : Uses Yahoo's Content Analysis webservice to return a list of entities 
- : encountered in the text supplied as input.
- : See http://developer.yahoo.com/search/content/V2/contentAnalysis.html for more information.
+ : <p>Uses Yahoo's Content Analysis webservice to return a list of entities 
+ : encountered in the text supplied as input.</p>
+ : <p>See http://developer.yahoo.com/search/content/V2/contentAnalysis.html for more information.</p>
  :
  : @param $text String to be analyzed
  : @return Sequence of recognized entities
@@ -60,9 +60,9 @@ declare %ann:sequential function ex:entities($text as xs:string) as element(ex:e
 };
 
 (:~
- : Uses Yahoo's Content Analysis webservice to return a list of categories (topics) related
- : to the text supplied as input.
- : See http://developer.yahoo.com/search/content/V2/contentAnalysis.html for more information.
+ : <p>Uses Yahoo's Content Analysis webservice to return a list of categories (topics) related
+ : to the text supplied as input.</p>
+ : <p>See http://developer.yahoo.com/search/content/V2/contentAnalysis.html for more information.</p>
  :
  : @param $text String to be analyzed
  : @return Sequence of recognized categories
@@ -78,9 +78,9 @@ declare %ann:sequential function ex:categories($text) as element(ex:category)*{
 };
 
 (:~
- : Uses Yahoo's Content Analysis webservice to return a list of relations (entities found and related wikipedia links)
- : encountered in the text supplied as input.
- : See http://developer.yahoo.com/search/content/V2/contentAnalysis.html for more information.
+ : <p>Uses Yahoo's Content Analysis webservice to return a list of relations (entities found and related wikipedia links)
+ : encountered in the text supplied as input.</p>
+ : <p>See http://developer.yahoo.com/search/content/V2/contentAnalysis.html for more information.</p>
  :
  : @param $text String to be analyzed
  : @return Sequence of recognized relations
@@ -107,9 +107,9 @@ declare %ann:sequential function ex:relations($text) as element(ex:relation)*{
 };
 
 (:~
- : Uses Yahoo's Content Analysis webservice to return a list of concepts (entity found and the corresponding wikipedia link) 
- : encountered in the text supplied as input.
- : See http://developer.yahoo.com/search/content/V2/contentAnalysis.html for more information.
+ : <p>Uses Yahoo's Content Analysis webservice to return a list of concepts (entity found and the corresponding wikipedia link) 
+ : encountered in the text supplied as input.</p>
+ : <p>See http://developer.yahoo.com/search/content/V2/contentAnalysis.html for more information.</p>
  :
  : @param $text String to be analyzed
  : @return Sequence of recognized concepts
@@ -136,8 +136,8 @@ declare %ann:sequential function ex:concepts($text) as element(ex:concept)*{
 };
 
 (:~
- : Uses Yahoo's Content Analysis webservice to return the text supplied as input
- : together with entities recognized annotated as xml elements in the text.
+ : <p>Uses Yahoo's Content Analysis webservice to return the text supplied as input
+ : together with entities recognized annotated as xml elements in the text.</p>
  :
  : @param $text String to be analyzed
  : @return Mixed sequence of strings and &lt;ex:entity&gt; elements
@@ -148,9 +148,9 @@ declare %ann:sequential function ex:entities-inline($text) as item()*{
 };
 
 (:~
- : Uses Yahoo's Content Analysis webservice to return the text supplied as input
+ : <p>Uses Yahoo's Content Analysis webservice to return the text supplied as input
  : together with concepts (entities with corresponding wikipedia link) annotated
- : as xml elements in the text.
+ : as xml elements in the text.</p>
  :
  : @param $text String to be analyzed
  : @return Mixed sequence of strings and &lt;ex:concept&gt; elements
@@ -161,7 +161,7 @@ declare %ann:sequential function ex:concepts-inline($text) as item()*{
 };
 
 (:~
- : Creates entities inline annotations in a given string
+ : <p>Creates entities inline annotations in a given string</p>
  :
  : @param $text String to be analyzed
  : @param $entities list of entities found in the given string
@@ -178,7 +178,7 @@ declare %private function ex:entity-inline-annotation($text, $entities, $size) a
 };
 
 (:~
- : Creates concepts inline annotations in a given string
+ : <p>Creates concepts inline annotations in a given string</p>
  :
  : @param $text String to be analyzed
  : @param $concepts list of concepts found in the given string
@@ -189,13 +189,13 @@ declare %private function ex:concept-inline-annotation($text, $concepts, $size) 
     if ( count($concepts) = 0 ) then $text 
     else(substring($text, 0, ($concepts[1]/ex:entity/@start) +1 -$size),
         if ( count( $concepts[1]/ex:wikipedia_url ) >= 1 ) 
-        then <ex:concept xmlns:ex="http://www.zorba-xquery.com/modules/info-extraction" start="{$concepts[1]/ex:entity/@start}" end="{$concepts[1]/ex:entity/@end}" url="{$concepts[1]/ex:wikipedia_url[1]/text()}">{$concepts[1]/ex:entity/text()}</ex:concept>
+        then <ex:concept xmlns:ex="http://zorba.io/modules/info-extraction" start="{$concepts[1]/ex:entity/@start}" end="{$concepts[1]/ex:entity/@end}" url="{$concepts[1]/ex:wikipedia_url[1]/text()}">{$concepts[1]/ex:entity/text()}</ex:concept>
         else $concepts[1]/ex:entity,
         ex:concept-inline-annotation(substring($text, ($concepts[1]/ex:entity/@end) +2 -$size), $concepts[position() >1], ($concepts[1]/ex:entity/@end) +1))
 };
 
 (:~
- : Establishes connection with the Yahoo Server
+ : <p>Establishes connection with the Yahoo Server</p>
  :
  : @param $text String to be analyzed
  : @return XML document returned by the Yahoo Server

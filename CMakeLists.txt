@@ -25,5 +25,5 @@ INCLUDE ("${Zorba_USE_FILE}")
 ADD_SUBDIRECTORY("src")
 
 ADD_TEST_DIRECTORY("${PROJECT_SOURCE_DIR}/test")
-
+EXPECTED_FAILURE(zorba_info-extraction_module/relations.xq 1194069)
 DONE_DECLARING_ZORBA_URIS ()
