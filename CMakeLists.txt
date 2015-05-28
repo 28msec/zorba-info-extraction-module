@@ -12,6 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+MESSAGE(STATUS "")
+MESSAGE(STATUS "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+MESSAGE(STATUS "Configuring external module <info-extraction>")
+MESSAGE(STATUS "-------------------------------------------------------------")
+MESSAGE(STATUS "")
+
 CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
 
 PROJECT (zorba_info-extraction_module)
@@ -27,3 +33,12 @@ ADD_SUBDIRECTORY("src")
 ADD_TEST_DIRECTORY("${PROJECT_SOURCE_DIR}/test")
 EXPECTED_FAILURE(zorba_info-extraction_module/relations.xq 1194069)
 DONE_DECLARING_ZORBA_URIS ()
+
+MESSAGE(STATUS "")
+MESSAGE(STATUS "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+MESSAGE(STATUS "Configuring external module <info-extraction>")
+MESSAGE(STATUS "-------------------------------------------------------------")
+MESSAGE(STATUS "")
+MESSAGE(STATUS "-------------------------------------------------------------")
+MESSAGE(STATUS "Configuration SUCCEEDED for external module <info-extraction>")
+MESSAGE(STATUS "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
